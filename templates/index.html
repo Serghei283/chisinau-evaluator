@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оценка недвижимости в Кишинёве</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f3f6fa; }
+        .container { max-width: 600px; margin: 40px auto; background: #fff; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header p { opacity: 0.9; font-size: 16px; }
+        .form-container { padding: 40px; }
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+        .form-group input, .form-group select { width: 100%; padding: 12px 15px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 16px; transition: border-color 0.3s; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #667eea; }
+        .btn { width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: 600; cursor: pointer; transition: transform 0.2s; }
+        .btn:hover { transform: translateY(-2px); }
+        .result { margin-top: 30px; padding: 25px; background: #f8f9fa; border-radius: 10px; border-left: 5px solid #667eea; }
+        .result h3 { color: #333; margin-bottom: 15px; }
+        .result-item { display: flex; justify-content: space-between; margin-bottom: 10px; padding: 8px 0; border-bottom: 1px solid #e1e5e9; }
+        .result-item:last-child { border-bottom: none; }
+        .result-value { font-weight: 600; color: #667eea; }
+        .price-highlight { font-size: 24px; color: #28a745; font-weight: bold; }
+        .error { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-top: 20px; }
+        .districts-info { margin-top: 30px; padding: 20px; background: #e3f2fd; border-radius: 10px; }
+        .districts-info h4 { margin-bottom: 15px; color: #1976d2; }
+        .district-item { display: flex; justify-content: space-between; padding: 5px 0; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 Оценка недвижимости</h1>
+            <p>Кишинёв, Молдова</p>
+        </div>
+        <div class="form-container">
+            <form id="evaluationForm">
+                <div class="form-group">
+                    <label for="address">Адрес (район, улица):</label>
+                    <input type="text" id="address" name="address" placeholder="Например: Центр, ул. Штефан чел Маре" required>
+                </div>
+                <div class="form-group">
+                    <label for="area">Площадь (м²):</label>
+                    <input type="number" id="area" name="area" placeholder="Например: 65" min="10" max="500" required>
+                </div>
+                <div class="form-group">
+                    <label for="rooms">Количество комнат:</label>
+                    <select id="rooms" name="rooms" required>
+                        <option value="">Выберите количество комнат</option>
+                        <option value="1">1 комната</option>
+                        <option value="2">2 комнаты</option>
+                        <option value="3">3 комнаты</option>
+                        <option value="4">4 комнаты</option>
+                        <option value="5">5+ комнат</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="floor">Этаж:</label>
+                    <input type="number" id="floor" name="floor" placeholder="Например: 5" min="1" max="25" required>
+                </div>
+                <div class="form-group">
+                    <label for="condition">Состояние:</label>
+                    <select id="condition" name="condition" required>
+                        <option value="">Выберите состояние</option>
+                        <option value="без_ремонта">Без ремонта</option>
+                        <option value="белый_вариант">Белый вариант</option>
+                        <option value="хорошее">Хорошее состояние</option>
+                        <option value="евроремонт">Евроремонт</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">💰 Оценить квартиру</button>
+            </form>
+            <div id="result" style="display: none;"></div>
+            <div class="districts-info">
+                <h4>📍 Средние цены по районам Кишинёва (€/м²):</h4>
+                <div class="district-item"><span>Центр</span><span>1,628 €</span></div>
+                <div class="district-item"><span>Рышкановка</span><span>1,444 €</span></div>
+                <div class="district-item"><span>Телецентру</span><span>1,325 €</span></div>
+                <div class="district-item"><span>Чеканы</span><span>1,293 €</span></div>
+                <div class="district-item"><span>Ботаника</span><span>1,200 €</span></div>
+                <div class="district-item"><span>Буюканы</span><span>1,150 €</span></div>
+                <div class="district-item"><span>Дурлешты</span><span>1,095 €</span></div>
+                <div class="district-item"><span>Чокана</span><span>1,050 €</span></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('evaluationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            try {
+                const response = await fetch('/api/evaluate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.success) {
+                    document.getElementById('result').innerHTML = `
+                        <div class="result">
+                            <h3>📊 Результат оценки</h3>
+                            <div class="result-item">
+                                <span>Район:</span>
+                                <span class="result-value">${result.district}</span>
+                            </div>
+                            <div class="result-item">
+                                <span>Описание:</span>
+                                <span class="result-value">${result.description}</span>
+                            </div>
+                            <div class="result-item">
+                                <span>Цена за м²:</span>
+                                <span class="result-value">${result.price_per_m2} €</span>
+                            </div>
+                            <div class="result-item">
+                                <span>Общая стоимость:</span>
+                                <span class="result-value price-highlight">${result.price.toLocaleString()} €</span>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('result').style.display = 'block';
+                } else {
+                    throw new Error(result.error || 'Ошибка при оценке');
+                }
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <div class="error">
+                        Ошибка: ${error.message}
+                    </div>
+                `;
+                document.getElementById('result').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
